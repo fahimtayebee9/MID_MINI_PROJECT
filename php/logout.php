@@ -2,5 +2,5 @@
     session_start();
 
     session_destroy();
-    header('location: ../layouts/login.html');
+    header('location: ../layouts/login.php');
 ?>
