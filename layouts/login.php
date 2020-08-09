@@ -21,8 +21,7 @@ session_start();
                 <div class="col-6 form-background">
                     <div class="row text-center justify-content-center align-items-center">
                         <div class="col-12">
-                            <h1>Hotel Management System Portal</h1>
-                            <p>Login To Continue</p>
+                            <h1>Login To Continue</h1>
                         </div>
                     </div>
                     <?php
@@ -61,7 +60,7 @@ session_start();
                             <h5></h5>
                         </div>
                         <div class="reg-area">
-                            <a href="../layouts/register.php">Don't have an Account? Click Here.</a>
+                            <a href="../layouts/registration.php">Don't have an Account? Click Here.</a>
                         </div>
                     </form>
                 </div>
