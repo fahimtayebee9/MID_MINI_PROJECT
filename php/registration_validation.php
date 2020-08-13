@@ -1,79 +1,61 @@
 <?php
-    include "../Php/DB_Config.php";
+    include "../php/DB_Config.php";
     session_start();
     if(isset($_POST['register'])){
+        $id                 = $_POST['id'];
         $name               = $_POST['name'];
         $email              = $_POST['email'];
         $password           = $_POST['password'];
-        $user               = strstr($email, '@', true);
-        $username           = $_POST['username'];
         $role               = $_POST['user_type'];
         $confirmPassword    = $_POST['confirm_password'];
-        $gender             = $_POST['gender'];
-        $day                = $_POST['day'];
-        $month              = $_POST['month'];
-        $year               = $_POST['year'];
-        $dob                = NULL;
-        $profile_picture    = $_FILES["profile_picture"]["name"];
         $errorPassCode = 0;
-        if(empty($name) || empty($email) || empty($password) || empty($username) || empty($gender) ||empty($day) || empty($month) || empty($year) || empty($profile_picture)){
+        if(empty($id) ||empty($name) || empty($email) || empty($password) || empty($confirmPassword) || empty($role)){
             $_SESSION['errorMessage'] = "Please Insert All Informations...";
             $errorPassCode = 1;
             echo "Done...133";
-            header('location: ../layouts/register.php');
+            header('location: ../layouts/registration.php');
         }
         // Password Match Checking
         else if($password != $confirmPassword){
             $_SESSION['errorMessage2'] = "Password did not matched...";
             $errorPassCode = 1;
             echo "Done...12";
-            header('location: ../layouts/register.php');
+            header('location: ../layouts/registration.php');
         }
         else{
             $validName = validateName($name);
             $validEmail = validateEmail($email);
             $validPassword = validatePassword($password);
-            $validDate = validateDate($day,$month,$year);
-            $_SESSION['suggest'] = $user;
             $errorCode=NULL;
-            if($validName == $validEmail = $validPassword = $validDate){
-                $sql = "SELECT email,username FROM users where email='$email';";
+            if($validName == $validEmail = $validPassword){
+                $sql = "SELECT email FROM user_test where id='$id';";
                 $result = mysqli_query($db, $sql);
-                while($data = mysqli_fetch_assoc($result)){
-                    $email_db    = $data['email'];
-                    $username_db   = $data['username'];
-                    echo $email_db."<br>".$username_db.'<br>';
-                    if($email == $email_db){
-                        $errorText = 'Email Already Exists!Try another email...';
-                        $_SESSION['errorText'] = $errorText;
-                        $_SESSION['email'] = $email;
-                        $_SESSION['name'] = $name;
-                        $_SESSION['username'] = $username;
-                        $_SESSION['dob'] = $dob;
-                        $errorCode = 404;
-                        header('location: ../layouts/registration.php');
-                        break;
+                $rowcount = mysqli_num_rows($result);
+                if($rowcount > 0){
+                    while($data = mysqli_fetch_assoc($result)){
+                        $id_db    = $data['id'];
+                        if($id == $id_db){
+                            $_SESSION['errorText'] = 'User ID Already Exists!Try another User Id...';
+                            header('location: ../layouts/registration.php');
+                            break;
+                        }
                     }
-                    else if($username == $username_db || $user == $username_db){
-                        $errorText = 'Email Already Exists!Try another email...';
-                        $_SESSION['errorText2'] = $errorText;
-                        $errorCode = 404;
-                        header('location: ../layouts/registration.php');
-                        break;
-                    }
-                    else{
-                        $errorCode = 0;
-                        header('location: ../layouts/login.php');
-                        break;
-                    }
-                }
-                if($errorCode == 404){
-                    echo "Error Code 404";
                 }
                 else{
-                    die("Connection Failed. Please try again later..." . mysqli_error($db));
+                    $errorCode = 0;
+                    $insert_query = "INSERT into user_test (id, password,name,email,userType) VALUES ( '$id', '$password', '$name', '$email', '$role')";
+                    $add_user    = mysqli_query($db, $insert_query);
+                    if($add_user){
+                        $_SESSION['register'] = 'Registration Successful...';
+                        header('location: ../layouts/login.php');
+                    }
+                    else{
+                        echo "Not Registered..";
+                    }
                 }
-                
+            }
+            else{
+                header('location: ../layouts/registration.php');
             }
         }
     }
@@ -93,6 +75,9 @@
                     $valid = 1;
                 }
             }   
+        }
+        else{
+            $_SESSION['errorText'] = "Name Must be 2 Characters...";
         }
         return $valid;
     }
@@ -123,15 +108,5 @@
         }
         // if($errorPassCode == 0){ }
         return $validPasswordCode;
-    }
-
-    // Date validation :
-    function validateDate($day,$month,$year){
-        $validDateCode =0;
-        if($day >=1 || $day <=31 && $month >=1 || $month <=12 && $year >= 1970 || $year >= 2020){
-            $dob = $day . "-" .$month . "-" . $year;
-            $validDateCode = 1;
-        }
-        return $validDateCode;
     }
 ?>
