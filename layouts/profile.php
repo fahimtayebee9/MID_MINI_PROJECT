@@ -14,39 +14,57 @@
 <body>
     <?php
         session_start();
-        $file = fopen('../php/user.txt', 'r');
-        $data = fread($file, filesize('../php/user.txt'));
-        $user = explode('|', $data);
-        if($_SESSION['id'] == $user[0]){
-            $valid_user = [$user[0],$user[1],$user[2],$user[3],$user[4]];
-    ?>
-        <table>
-            <tr>
-                <td colspan=2 style="text-align: center;">Profile</td>
-            </tr>
-            <tr>
-                <td>Id </td>
-                <td><?php echo $user[0]?></td>
-            </tr>
-            <tr>
-                <td>Name </td>
-                <td><?php echo $user[2]?></td>
-            </tr>
-            <tr>
-                <td>Email </td>
-                <td><?php echo $user[3]?></td>
-            </tr>
-            <tr>
-                <td>User Type </td>
-                <td><?php echo $user[4]?></td>
-            </tr>
-        </table>
-    <?php
+        include "../php/DB_Config.php";
+        $id=$_SESSION['id'];
+        $sql = "SELECT * from user_test where id = '$id'";
+        $result = mysqli_query($db,$sql);
+        if(mysqli_num_rows($result) > 1){
+            echo "ERROR 404";
         }
         else{
-            echo "Invalid User Data";
+            $data=mysqli_fetch_assoc($result);
+            $name = $data['name'];
+            $email = $data['email'];
+            $userType = $data['userType'];
         }
     ?>
-    
+    <table>
+        <tr>
+            <td colspan=2 style="text-align: center;">Profile</td>
+        </tr>
+        <tr>
+            <td>Id </td>
+            <td><?php echo $id;?></td>
+        </tr>
+        <tr>
+            <td>Name </td>
+            <td><?php echo $name;?></td>
+        </tr>
+        <tr>
+            <td>Email </td>
+            <td><?php echo $email?></td>
+        </tr>
+        <tr>
+            <td>User Type </td>
+            <td><?php echo $userType?></td>
+        </tr>
+        <tr>
+            <td colspan=2>
+                <?php
+
+                    if($_SESSION['role'] == 'Admin'){
+                ?>
+                        <a href="admin_home.php">Go Home</a>
+                <?php
+                    }
+                    else{
+                ?>
+                    <a href="user_home.php">Go Home</a>
+                <?php
+                    }
+                ?>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
